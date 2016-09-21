@@ -1,6 +1,7 @@
 var canvas = document.getElementById('myCan');
 var ctx = canvas.getContext('2d');
-//global cache
+
+//global variables
 var canH = canvas.height;
 var canW = canvas.width;
 var histH = 200;
@@ -11,6 +12,26 @@ var scale = 25;
 var center = canW/2;
 var pinY = padT + scale;
 var pinX = center;
+
+
+// drawing shapes
+var drawDot =  function drawDot(obj){
+  ctx.beginPath();
+  ctx.arc(obj.x, obj.y, obj.r, 0, 2 * Math.PI);
+  ctx.fillStyle = obj.color;
+  ctx.fill();
+  ctx.closePath();
+}
+var drawBox = function drawBox(obj){
+  ctx.beginPath();
+  ctx.rect(obj.x, obj.y, obj.w, obj.h);
+  ctx.fillStyle = obj.color;
+  ctx.fill();
+  ctx.closePath();
+  }
+
+
+//these are temp for looks
 var drawHist = function drawHist(){
   ctx.beginPath();
   ctx.rect(0, histY, canW , histH);
@@ -25,34 +46,11 @@ var drawStart = function drawStart(){
   ctx.fill();
   ctx.closePath();
 }
-var drawGrid = function drawGrid(){
-  var x = 0;
-  var y = 50;
-  var cen = 200;
-  var w = 12.5;
-  var h = 12.5;
-  for (var i =1; i< 16; i++){
-    x = cen -12.5;
-    if( i % 2 !== 0){
-      ctx.beginPath();
-      ctx.rect(x, y, w, h);
-      ctx.fillStyle = "#f9f";
-      ctx.fill();
-      ctx.closePath();
-    }
-    x += 25;
-  }
-}
-var drawDot =  function drawDot(obj){
-  ctx.beginPath();
-  ctx.arc(obj.x, obj.y, obj.r, 0, 2 * Math.PI);
-  ctx.fillStyle = obj.color;
-  ctx.fill();
-  ctx.closePath();
-}
 
-
+//this ones a keeper
 var drawPins = function drawPins(){
+  pinX = center;
+  pinY = padT + scale;
   var pin = {
     x : pinX,
     y : pinY,
@@ -73,21 +71,50 @@ var drawPins = function drawPins(){
   }
 }
 
-var drawZones = function drawZones(){
-//histogram
+//more testing
+var bounceL = function bounceL(ball){
+  ball.xd = -3;
+  ball.yd = -3;
+}
+//testing
+var balld = 3;
+var ballObj = {x: center, y: 0, xd: 0, yd : 3, color:'#f9f', r: 4};
+var dropBall = function dropBall(ball){
+
+  ball.x += ball.xd;
+  ball.y += ball.yd;
+  if (ball.y >= 72){
+    bounceL(ball);
+  }
+/*  if (ball.x % scale === 0){
+    ball.xd = 0;
+  }*/
+  drawDot(ball);
+};
+
+
+var draw = function draw(){
+  ctx.clearRect(0,0,canW,canH);
   drawStart();
   drawHist();
-  drawGrid();
   drawPins();
+  dropBall(ballObj);
+}
 
-//top partition
-
-};
+setInterval(draw, 1000/30)
 /*
 global values: canvas h/w, h/w of each object,
-objects: pins, histogram, ballqueue, ball constructor, */
+objects: pins, histogram, ballqueue, ball constructor,
 
-
-
-
-drawZones();
+ball drops
+  when ball.x = first dot.x
+      new ball is added to drop queue
+      random function
+        if 1 or 0,
+          left or right function.
+  until ball hits histogram.
+    what part of histogram did the ball hit?
+      the height of that box grows
+      the number of that box grows
+    ball is removed from queue
+ */
